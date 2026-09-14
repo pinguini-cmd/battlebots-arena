@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="BattleBots Arena: simulador de combate de robots hecho en Unity con fisicas soft-body. Robots, arena, reglas, controles y descarga para Windows.">
+<meta property="og:title" content="BattleBots Arena">
+<meta property="og:description" content="Simulador de combate de robots hecho en Unity. Descarga para Windows.">
+<meta property="og:image" content="hero.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230b0c0e'/%3E%3Ccircle cx='32' cy='32' r='24' fill='none' stroke='%23e21f26' stroke-width='6'/%3E%3Crect x='6' y='27' width='52' height='10' fill='%23f2c200'/%3E%3C/svg%3E">
+<title>BattleBots Arena</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ink: #0b0c0e;
+    --steel: #1b1d21;
+    --steel-2: #262930;
+    --edge: #383c45;
+    --chrome: #c9ced6;
+    --text: #f1f2f4;
+    --dim: #9aa0aa;
+    --red: #e21f26;
+    --red-deep: #8b1015;
+    --hazard: #f2c200;
+    --display: "Michroma", "Eurostile", "Bank Gothic", "Arial Black", Arial, sans-serif;
+    --head: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", Arial, sans-serif;
+    --body: "Barlow", "Segoe UI", Arial, sans-serif;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--ink);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--hazard); outline-offset: 3px; }
+  img { max-width: 100%; display: block; }
+
+  .hazard {
+    height: 10px;
+    background: repeating-linear-gradient(-45deg, var(--hazard) 0 16px, var(--ink) 16px 32px);
+  }
+  .wrap { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+
+  /* ── Barra superior ───────────────────────────── */
+  .topbar {
+    position: sticky; top: 0; z-index: 20;
+    background: rgba(11, 12, 14, .92);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--edge);
+  }
+  .topbar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 24px; height: 64px; }
+  .mark {
+    font-family: var(--display); font-size: 17px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 12px; white-space: nowrap;
+  }
+  .mark b { color: var(--red); font-weight: 400; }
+  .mark .tag {
+    font-family: var(--body); font-size: 11px; letter-spacing: .2em; color: var(--dim);
+    border: 1px solid var(--edge); padding: 3px 8px;
+  }
+  .nav { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+  .nav a {
+    font-family: var(--head); font-weight: 700; font-size: 16px; letter-spacing: .08em; text-transform: uppercase;
+    text-decoration: none; color: var(--chrome); padding: 8px 12px;
+  }
+  .nav a:hover { color: var(--text); background: var(--steel-2); }
+  .nav a.cta { background: var(--red); color: #fff; }
+  .nav a.cta:hover { background: #ff2b33; }
+
+  /* ── Hero ─────────────────────────────────────── */
+  .hero {
+    position: relative; overflow: hidden;
+    background:
+      radial-gradient(ellipse 60% 70% at 18% 10%, rgba(226, 31, 38, .22), transparent 60%),
+      repeating-linear-gradient(135deg, rgba(255, 255, 255, .025) 0 2px, transparent 2px 7px),
+      linear-gradient(180deg, #121316 0%, var(--ink) 100%);
+    border-bottom: 1px solid var(--edge);
+  }
+  .hero .wrap {
+    display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: center;
+    padding: 64px 0 56px;
+  }
+  .eyebrow {
+    font-family: var(--display); font-size: 12px; letter-spacing: .28em; text-transform: uppercase; color: var(--hazard);
+    display: flex; align-items: center; gap: 14px; margin: 0 0 20px;
+  }
+  .eyebrow::before { content: ""; width: 34px; height: 3px; background: var(--red); }
+  h1 {
+    font-family: var(--head); font-weight: 800; text-transform: uppercase; line-height: .92;
+    font-size: clamp(54px, 8vw, 104px); margin: 0 0 22px; letter-spacing: -.01em; text-wrap: balance;
+  }
+  h1 span { color: var(--red); }
+  .lede { font-size: 19px; color: var(--chrome); max-width: 34em; margin: 0 0 30px; }
+  .ctas { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn {
+    font-family: var(--head); font-weight: 700; font-size: 20px; letter-spacing: .1em; text-transform: uppercase;
+    text-decoration: none; padding: 14px 26px; border: 2px solid transparent; display: inline-flex; align-items: center; gap: 10px;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    transition: transform .12s ease, background .12s ease;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn-red { background: var(--red); color: #fff; }
+  .btn-red:hover { background: #ff2b33; }
+  .btn-steel { background: var(--steel-2); color: var(--text); border-color: var(--edge); }
+  .btn-steel:hover { background: #31353d; }
+  .btn[aria-disabled="true"] { background: var(--steel-2); color: var(--dim); cursor: not-allowed; }
+  .btn[aria-disabled="true"]:hover { transform: none; }
+
+  .screen {
+    background: linear-gradient(180deg, #4a4f58, #23262c);
+    padding: 12px; box-shadow: 0 30px 60px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .15);
+    clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
+  }
+  .screen img { width: 100%; height: auto; border: 1px solid #000; }
+  .screen figcaption {
+    font-family: var(--head); font-size: 14px; letter-spacing: .18em; text-transform: uppercase; color: #aeb4bd;
+    display: flex; justify-content: space-between; padding: 10px 4px 0;
+  }
+  .screen figcaption i { font-style: normal; color: var(--hazard); }
+
+  .spinner {
+    position: absolute; right: -120px; top: -140px; width: 420px; height: 420px; opacity: .08; pointer-events: none;
+    animation: spin 14s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Marcador de combate (numeros grandes) ───── */
+  .ticker { background: var(--steel); border-top: 1px solid var(--edge); border-bottom: 1px solid var(--edge); }
+  .ticker .wrap { display: grid; grid-template-columns: repeat(4, 1fr); }
+  .ticker div { padding: 20px 18px; border-left: 1px solid var(--edge); }
+  .ticker div:first-child { border-left: 0; padding-left: 0; }
+  .ticker b { font-family: var(--head); font-weight: 800; font-size: 46px; line-height: 1; display: block; color: var(--text); font-variant-numeric: tabular-nums; }
+  .ticker b em { font-style: normal; color: var(--red); }
+  .ticker span { font-family: var(--head); font-size: 15px; letter-spacing: .16em; text-transform: uppercase; color: var(--dim); }
+
+  /* ── Secciones ────────────────────────────────── */
+  section { padding: 72px 0; }
+  section + section { border-top: 1px solid var(--edge); }
+  .sec-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 34px; flex-wrap: wrap; }
+  h2 {
+    font-family: var(--head); font-weight: 800; text-transform: uppercase; font-size: clamp(38px, 5vw, 58px);
+    line-height: .95; margin: 0; letter-spacing: -.005em; text-wrap: balance;
+  }
+  .sec-head p { margin: 0; color: var(--dim); max-width: 34em; font-size: 17px; }
+  h3 { font-family: var(--head); font-weight: 700; text-transform: uppercase; font-size: 24px; letter-spacing: .04em; margin: 0 0 8px; }
+  p { margin: 0 0 12px; }
+
+  .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .feature { background: var(--steel); border: 1px solid var(--edge); padding: 26px 24px 22px; position: relative; }
+  .feature::before { content: ""; position: absolute; left: 0; top: 0; width: 6px; height: 100%; background: var(--red); }
+  .feature p { color: var(--chrome); margin: 0; font-size: 16px; }
+  .feature .k { font-family: var(--display); font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--hazard); margin: 0 0 12px; }
+
+  /* ── Robots ───────────────────────────────────── */
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 26px; }
+  .filters button {
+    font-family: var(--head); font-weight: 700; font-size: 15px; letter-spacing: .1em; text-transform: uppercase;
+    background: var(--steel); color: var(--chrome); border: 1px solid var(--edge); padding: 8px 14px; cursor: pointer;
+  }
+  .filters button[aria-pressed="true"] { background: var(--hazard); color: #111; border-color: var(--hazard); }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .bot { background: var(--steel); border: 1px solid var(--edge); display: flex; flex-direction: column; transition: transform .15s ease, border-color .15s ease; }
+  .bot:hover { transform: translateY(-3px); border-color: #555a64; }
+  .bot[hidden] { display: none; }
+  .plate { height: 10px; background: var(--acc, var(--red)); }
+  .bot .in { padding: 16px 16px 18px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .bot h3 { font-size: 30px; line-height: 1; margin: 0; }
+  .meta { display: flex; gap: 8px; flex-wrap: wrap; }
+  .meta span { font-family: var(--head); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); border: 1px solid var(--edge); padding: 3px 7px; }
+  .meta span.w { color: var(--text); border-color: #4a4f58; }
+  .bot p { color: var(--chrome); font-size: 15px; margin: 0; flex: 1; }
+  .stats { display: grid; grid-template-columns: auto 1fr; gap: 6px 10px; align-items: center; margin-top: 6px; }
+  .stats label { font-family: var(--head); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+  .seg { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; }
+  .seg i { height: 8px; background: var(--steel-2); }
+  .seg i.on { background: var(--acc, var(--red)); }
+  .roster { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .roster h3 { color: var(--chrome); font-size: 20px; }
+  .roster h3 small { color: var(--dim); font-family: var(--body); font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 15px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chips span { font-family: var(--head); font-weight: 600; font-size: 16px; letter-spacing: .04em; background: var(--steel); border: 1px solid var(--edge); padding: 4px 10px; }
+  .chips span[hidden] { display: none; }
+  .chips span::before { content: attr(data-w); font-family: var(--display); font-size: 9px; letter-spacing: 0; color: var(--hazard); margin-right: 8px; }
+
+  /* ── Arena ────────────────────────────────────── */
+  .arena { display: grid; grid-template-columns: 1.1fr .9fr; gap: 32px; align-items: start; }
+  .haz { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .haz div { background: var(--steel); border: 1px solid var(--edge); padding: 18px; }
+  .haz b { font-family: var(--head); font-size: 22px; text-transform: uppercase; letter-spacing: .04em; display: block; margin-bottom: 4px; }
+  .haz p { color: var(--chrome); font-size: 15px; margin: 0; }
+  .eras { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .eras li { display: grid; grid-template-columns: 96px 1fr; gap: 14px; align-items: baseline; padding: 12px 14px; background: var(--steel); border-left: 4px solid var(--hazard); }
+  .eras b { font-family: var(--head); font-size: 22px; font-variant-numeric: tabular-nums; }
+  .eras span { color: var(--chrome); font-size: 15px; }
+
+  /* ── Reglas ───────────────────────────────────── */
+  .rules { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+  .rule { background: var(--steel); border: 1px solid var(--edge); padding: 24px; }
+  .rule .big { font-family: var(--head); font-weight: 800; font-size: 84px; line-height: .9; color: var(--hazard); display: block; margin: 0 0 8px; font-variant-numeric: tabular-nums; }
+  .rule .big.red { color: var(--red); }
+  .rule p { color: var(--chrome); font-size: 15px; margin: 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 16px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--edge); vertical-align: top; }
+  th { font-family: var(--head); font-size: 14px; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); font-weight: 700; }
+  td.n { font-family: var(--head); font-weight: 800; font-size: 24px; color: var(--hazard); font-variant-numeric: tabular-nums; width: 70px; }
+  .scroll { overflow-x: auto; }
+  kbd {
+    font-family: var(--head); font-weight: 700; font-size: 15px; letter-spacing: .06em; color: var(--text);
+    background: var(--steel-2); border: 1px solid #4a4f58; border-bottom-width: 3px; padding: 2px 8px; white-space: nowrap;
+  }
+  .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+
+  /* ── Descarga ─────────────────────────────────── */
+  .dl { display: grid; grid-template-columns: 1.1fr .9fr; gap: 28px; align-items: start; }
+  .dl-box { background: linear-gradient(180deg, #23262c, var(--steel)); border: 1px solid var(--edge); padding: 30px; position: relative; }
+  .dl-box::after { content: ""; position: absolute; right: 0; top: 0; width: 100%; height: 6px; background: repeating-linear-gradient(-45deg, var(--hazard) 0 12px, transparent 12px 24px); opacity: .9; }
+  .dl-box .ver { font-family: var(--display); font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--hazard); margin: 0 0 12px; }
+  .dl-box h3 { font-size: 34px; }
+  .dl-box .file { font-family: var(--head); font-size: 18px; color: var(--chrome); letter-spacing: .04em; margin: 6px 0 20px; }
+  .note { border: 1px dashed #5a5f69; padding: 12px 14px; color: var(--chrome); font-size: 15px; margin-top: 16px; }
+  ol.steps { margin: 0; padding-left: 22px; color: var(--chrome); display: flex; flex-direction: column; gap: 8px; }
+  ol.steps li::marker { font-family: var(--head); font-weight: 800; color: var(--hazard); }
+  ul.req { margin: 0; padding-left: 20px; color: var(--chrome); display: flex; flex-direction: column; gap: 6px; }
+
+  footer { border-top: 1px solid var(--edge); padding: 40px 0 60px; color: var(--dim); font-size: 14px; }
+  footer .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  footer h4 { font-family: var(--head); font-size: 16px; letter-spacing: .14em; text-transform: uppercase; color: var(--chrome); margin: 0 0 8px; }
+  footer p { margin: 0 0 8px; }
+  footer a { color: var(--chrome); }
+
+  @media (max-width: 960px) {
+    .hero .wrap { grid-template-columns: 1fr; padding: 44px 0 40px; }
+    .spinner { display: none; }
+    .ticker .wrap { grid-template-columns: 1fr 1fr; }
+    .ticker div:nth-child(3) { border-left: 0; padding-left: 0; }
+    .ticker div { border-top: 1px solid var(--edge); }
+    .ticker div:nth-child(-n+2) { border-top: 0; }
+    .features, .rules { grid-template-columns: 1fr; }
+    .grid { grid-template-columns: repeat(2, 1fr); }
+    .arena, .roster, .controls, .dl, footer .wrap { grid-template-columns: 1fr; }
+    .nav a:not(.cta) { display: none; }
+  }
+  @media (max-width: 560px) {
+    .grid { grid-template-columns: 1fr; }
+    .haz { grid-template-columns: 1fr; }
+    .ticker .wrap { grid-template-columns: 1fr; }
+    .ticker div { border-left: 0; padding-left: 0; }
+    .mark .tag { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="hazard" aria-hidden="true"></div>
+<header class="topbar">
+  <div class="wrap">
+    <a class="mark" href="#top">Battle<b>Bots</b> Arena <span class="tag">FAN-MADE</span></a>
+    <nav class="nav" aria-label="Secciones">
+      <a href="#combate">Combate</a>
+      <a href="#robots">Robots</a>
+      <a href="#arena">Arena</a>
+      <a href="#reglas">Reglas</a>
+      <a href="#controles">Controles</a>
+      <a class="cta" href="#descarga">Descargar</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <svg class="spinner" viewBox="0 0 200 200" aria-hidden="true">
+      <circle cx="100" cy="100" r="92" fill="none" stroke="#fff" stroke-width="6"/>
+      <rect x="14" y="88" width="172" height="24" fill="#fff"/>
+      <rect x="10" y="80" width="28" height="40" fill="#fff"/>
+      <rect x="162" y="80" width="28" height="40" fill="#fff"/>
+      <circle cx="100" cy="100" r="16" fill="#0b0c0e"/>
+    </svg>
+    <div class="wrap">
+      <div>
+        <p class="eyebrow">Simulador de combate de robots · Unity 6</p>
+        <h1>Tu propio <span>BattleBox</span>, con físicas de verdad</h1>
+        <p class="lede">Elige uno de los 75 robots de la serie, entra en la arena y pelea tres minutos contra la IA. Spinners que muerden el piso, flippers que lanzan al rival por los aires, tornillos y sierras de la arena, un árbitro que cuenta y tres jueces que deciden. Nada es un truco de guion: cada golpe es una colisión.</p>
+        <div class="ctas">
+          <a class="btn btn-red" href="#descarga">Descargar para Windows</a>
+          <a class="btn btn-steel" href="#robots">Ver el plantel</a>
+        </div>
+      </div>
+      <figure class="screen">
+        <img src="hero.jpg" width="1572" height="672" alt="Pantalla de inicio del juego: título BattleBots sobre chapa de acero, tarjeta VS y paneles para elegir tu robot, el rival y la duración del combate.">
+        <figcaption><span>Pantalla de inicio</span><i>Bite Force vs Saw Blaze</i></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <div class="ticker" aria-label="Cifras del juego">
+    <div class="wrap">
+      <div><b>75</b><span>robots de las dos eras</span></div>
+      <div><b>3<em>:</em>00</b><span>minutos por combate</span></div>
+      <div><b>4</b><span>arenas con peligros</span></div>
+      <div><b>113 <em>kg</em></b><span>peso pesado, como en la serie</span></div>
+    </div>
+  </div>
+
+  <section id="combate">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Así se pelea</h2>
+        <p>Todo lo que pasa en la arena sale de la física: masas reales, ruedas que patinan, piezas que se abollan y se arrancan.</p>
+      </div>
+      <div class="features">
+        <article class="feature">
+          <p class="k">Chasis soft-body</p>
+          <h3>Se abolla como en BeamNG</h3>
+          <p>Cada robot lleva una malla de nodos y piezas rompibles: un golpe fuerte deja la abolladura, desgasta la pieza y, si supera su anclaje, la arranca con su collider y sale volando por la arena.</p>
+        </article>
+        <article class="feature">
+          <p class="k">Tank drive</p>
+          <h3>Cada rueda empuja por su cuenta</h3>
+          <p>Avance y giro se mezclan por lado, como en una emisora de dos palancas. Un modelo de neumático con círculo de fricción limita el empuje a lo que agarra la goma: aceleras a casi 1 g y giras derrapando, no por arte de magia.</p>
+        </article>
+        <article class="feature">
+          <p class="k">Armas</p>
+          <h3>Energía cinética de verdad</h3>
+          <p>Discos, tambores y barras tardan segundos en subir de vueltas y lanzan al rival según la energía que llevan. Si el arma muerde el piso, el que sale disparado eres tú. Flippers, martillos y sierras van con bisagras y motores físicos.</p>
+        </article>
+        <article class="feature">
+          <p class="k">Efecto giroscópico</p>
+          <h3>El baile del gyro</h3>
+          <p>Un spinner vertical a tope se resiste a girar y, muy de vez en cuando, deja al robot de pie sobre un costado hasta que apaga el arma. Lo de End Game en la tele, aquí pasa solo.</p>
+        </article>
+        <article class="feature">
+          <p class="k">Comentaristas</p>
+          <h3>Chris y Kenny narran el combate</h3>
+          <p>Voces en inglés con las voces de Windows: comentan los golpes, las cuentas del árbitro, quién domina y cómo va el reloj. Sin chistes, solo el combate.</p>
+        </article>
+        <article class="feature">
+          <p class="k">Cámaras</p>
+          <h3>Cuatro vistas con una tecla</h3>
+          <p>Cinemática de retransmisión, tercera persona, cámara a bordo en el morro del robot y el puesto de pilotos: la vista desde el borde de la arena, elevada tras el lexan, como la tienen los equipos.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="robots">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>El plantel</h2>
+        <p>Dieciséis destacados con ficha completa y los otros cincuenta y nueve por era. Ocho robots llevan modelos 3D de la comunidad; el resto se generan por procedimientos a partir de sus medidas.</p>
+      </div>
+      <div class="filters" role="group" aria-label="Filtrar por arma">
+        <button type="button" data-f="all" aria-pressed="true">Todos</button>
+        <button type="button" data-f="VerticalDisc" aria-pressed="false">Disco vertical</button>
+        <button type="button" data-f="HorizontalBar" aria-pressed="false">Barra horizontal</button>
+        <button type="button" data-f="Drum" aria-pressed="false">Tambor</button>
+        <button type="button" data-f="Shell" aria-pressed="false">Carcasa</button>
+        <button type="button" data-f="Flipper" aria-pressed="false">Flipper</button>
+        <button type="button" data-f="Hammer" aria-pressed="false">Martillo</button>
+        <button type="button" data-f="Saw" aria-pressed="false">Sierra</button>
+        <button type="button" data-f="Lifter" aria-pressed="false">Elevador</button>
+        <button type="button" data-f="Crusher" aria-pressed="false">Triturador</button>
+      </div>
+      <div class="grid" id="featured"></div>
+      <div class="roster">
+        <div>
+          <h3>Reboot (2015–) <small>· 39 más</small></h3>
+          <div class="chips" id="roster-reboot"></div>
+        </div>
+        <div>
+          <h3>Era original (2000–2002) <small>· 20 robots</small></h3>
+          <div class="chips" id="roster-original"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="arena">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>La arena</h2>
+        <p>Suelo de acero, paredes de lexan de 3,6 m y los peligros clásicos. Salir por encima de la barrera no es derrota inmediata: empieza una cuenta de diez.</p>
+      </div>
+      <div class="arena">
+        <div class="haz">
+          <div><b>Killsaws</b><p>Sierras que suben del suelo por franjas. Cortan blindaje y lanzan chispas y piezas.</p></div>
+          <div><b>Pulverizers</b><p>Martillos hidráulicos en las esquinas. Un golpe desde arriba hunde cualquier tapa.</p></div>
+          <div><b>Tornillos</b><p>Hélices de 400 kg que giran despacio, te levantan a medias y te aprietan contra la pared. A los diez segundos invierten el giro para soltarte.</p></div>
+          <div><b>Hellraisers y arietes</b><p>Trampillas que levantan el suelo y arietes que empujan desde la pared: el robot que se queda parado ahí, paga.</p></div>
+        </div>
+        <ul class="eras">
+          <li><b>2000–02</b><span>La BattleBox original: suelo con trampillas y las sierras de siempre.</span></li>
+          <li><b>2015–19</b><span>La arena del reboot en Discovery: pulverizers en las esquinas y tornillos en los laterales.</span></li>
+          <li><b>2020+</b><span>La BattleBox nueva de Las Vegas, con las paredes altas y las zonas de salida.</span></li>
+          <li><b>Propia</b><span>Una arena limpia para probar robots sin peligros.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="reglas">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Reglas, como en la serie</h2>
+        <p>Tres formas de acabar un combate: KO por cuenta del árbitro, fuera de la arena o decisión de los jueces al terminar el tiempo.</p>
+      </div>
+      <div class="rules">
+        <article class="rule">
+          <span class="big">10</span>
+          <h3>La cuenta del árbitro</h3>
+          <p>El árbitro vigila tus palancas: si estás dando palanca y el robot no se desplaza, te pregunta «¿te puedes mover?» y empieza a contar. Desplázate treinta y cinco centímetros o gira de verdad y la cuenta se cancela. Los invertibles siguen peleando boca abajo; los demás tienen que enderezarse.</p>
+        </article>
+        <article class="rule">
+          <span class="big red">OOTA</span>
+          <h3>Fuera de la arena</h3>
+          <p>Si tu rival te lanza por encima de la barrera, empieza otra cuenta de diez. Volver a entrar es casi imposible, pero se ha visto.</p>
+        </article>
+        <article class="rule">
+          <span class="big">3 × 11</span>
+          <h3>Decisión de los jueces</h3>
+          <p>Si se acaba el tiempo, tres jueces puntúan cada uno 11 puntos: daño 5, agresividad 3 y control 3. Gana quien se lleve a la mayoría de los jueces, con el resumen de cada uno en la pantalla final.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="controles">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Controles</h2>
+        <p>Teclado. La chuleta completa aparece en el juego con <kbd>F1</kbd>.</p>
+      </div>
+      <div class="controls">
+        <div class="scroll">
+          <table>
+            <thead><tr><th>Robot</th><th>Tecla</th></tr></thead>
+            <tbody>
+              <tr><td>Avanzar / retroceder</td><td><kbd>W</kbd> <kbd>S</kbd> o <kbd>↑</kbd> <kbd>↓</kbd></td></tr>
+              <tr><td>Girar (tank drive)</td><td><kbd>A</kbd> <kbd>D</kbd> o <kbd>←</kbd> <kbd>→</kbd></td></tr>
+              <tr><td>Spinner encendido / apagado</td><td><kbd>Espacio</kbd></td></tr>
+              <tr><td>Flipper, martillo o sierra (mantener)</td><td><kbd>F</kbd></td></tr>
+              <tr><td>Enderezarse (y celebrar)</td><td><kbd>E</kbd></td></tr>
+              <tr><td>Pedir ayuda a la IA si estás volcado</td><td><kbd>H</kbd></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="scroll">
+          <table>
+            <thead><tr><th>Cámara y partida</th><th>Tecla</th></tr></thead>
+            <tbody>
+              <tr><td>Cambiar de vista: cinemática, tercera persona, a bordo, puesto de pilotos</td><td><kbd>V</kbd></td></tr>
+              <tr><td>Orbitar / zoom</td><td>Click derecho + ratón, rueda</td></tr>
+              <tr><td>Girar, inclinar, acercar, recentrar</td><td><kbd>Num 4</kbd> <kbd>6</kbd> <kbd>8</kbd> <kbd>2</kbd> <kbd>+</kbd> <kbd>−</kbd> <kbd>5</kbd></td></tr>
+              <tr><td>Comentaristas encendidos / apagados</td><td><kbd>C</kbd></td></tr>
+              <tr><td>Chuleta de controles</td><td><kbd>F1</kbd></td></tr>
+              <tr><td>Volver al menú</td><td><kbd>Esc</kbd></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="descarga">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Descarga</h2>
+        <p>Build para Windows de 64 bits. No hace falta instalar nada: descomprime y juega.</p>
+      </div>
+      <div class="dl">
+        <div class="dl-box">
+          <p class="ver">Versión 0.9 · build 29</p>
+          <h3>BattleBots Arena para Windows</h3>
+          <p class="file" id="file-name">BattleBots_Windows.zip</p>
+          <a class="btn btn-red" id="dl-btn" href="#instalar">Descargar el juego</a>
+          <p class="note" id="dl-note">El enlace de descarga se activa en cuanto termine el build. Si llegaste aquí antes, vuelve en un rato o pide el zip a quien te pasó esta página.</p>
+        </div>
+        <div>
+          <h3 id="instalar">Cómo instalarlo</h3>
+          <ol class="steps">
+            <li>Descarga el zip y descomprímelo en una carpeta (click derecho → Extraer todo).</li>
+            <li>Abre <strong>BattleBots.exe</strong>. Si Windows SmartScreen avisa, pulsa «Más información» y luego «Ejecutar de todas formas»: el juego no está firmado.</li>
+            <li>En el menú elige tu robot, el rival, la duración y la arena, y pulsa <strong>Pelear</strong>.</li>
+          </ol>
+          <h3 style="margin-top:22px">Requisitos</h3>
+          <ul class="req">
+            <li>Windows 10 u 11 de 64 bits.</li>
+            <li>Gráfica compatible con DirectX 11; con una integrada moderna va, pero baja la resolución.</li>
+            <li>Unos 600 MB libres para el juego descomprimido.</li>
+            <li>Para los comentaristas con voz, las voces en inglés de Windows (Configuración → Hora e idioma → Voz).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <h4>Créditos</h4>
+      <p>Juego hecho en Unity 6 (URP) por Jose como proyecto personal. Los robots procedurales se generan a partir de las medidas reales de cada máquina.</p>
+      <p>Modelos 3D: Bite Force, HUGE, SawBlaze, Bronco, Son of Whyachi, Monsoon y Lock-Jaw por <a href="https://sketchfab.com/TzHaar-Ket" rel="noopener">TzHaar-Ket</a> (Sketchfab, licencia CC BY 4.0). SubZero a partir de «Icebreaker 2» de <a href="https://sketchfab.com/3d-models/icebreaker-2-67cf3d95bff04047a9610ad2cca9b7c3" rel="noopener">superbomb122</a> (CC BY 4.0).</p>
+    </div>
+    <div>
+      <h4>Aviso</h4>
+      <p>Proyecto de aficionado sin ánimo de lucro. BattleBots y los nombres de los robots pertenecen a sus dueños (BattleBots Inc. y los equipos); esta página y el juego no tienen relación con ellos ni con Discovery.</p>
+      <p>Página publicada para compartir el juego con amigos. <span id="year"></span></p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Enlace de descarga: se rellena cuando el build esta subido (OneDrive / Drive).
+  const DOWNLOAD_URL = "";
+
+  const W = {
+    VerticalDisc: "Disco vertical", HorizontalBar: "Barra horizontal", Drum: "Tambor", Shell: "Carcasa giratoria",
+    Flipper: "Flipper", Hammer: "Martillo", Saw: "Brazo con sierra", Lifter: "Elevador", Crusher: "Triturador", None: "Cuña"
+  };
+  const G = { VerticalDisc: "DV", HorizontalBar: "BH", Drum: "TB", Shell: "CG", Flipper: "FL", Hammer: "MT", Saw: "SR", Lifter: "EL", Crusher: "TR", None: "CÑ" };
+
+  // Destacados: nombre, arma, era, velocidad/potencia/blindaje (1-5), color de placa, descripcion
+  const featured = [
+    ["Bite Force", "VerticalDisc", "Reboot", 4, 5, 5, "#ffd11a", "Disco vertical de Paul Ventimiglia. Campeón 2015, 2018 y 2019. Invertible: sigue peleando boca abajo. Modelo 3D de TzHaar-Ket."],
+    ["Tombstone", "HorizontalBar", "Reboot", 3, 5, 2, "#b3b8bf", "La barra horizontal de Ray Billings, campeón 2016. Dos ruedas, una barra de 27 kg y el golpe más temido de la era moderna."],
+    ["End Game", "VerticalDisc", "Reboot", 4, 5, 3, "#40cc4d", "Disco vertical de OYES Robotics, campeón 2020. Rápido y compacto; sus aros traseros lo enderezan."],
+    ["HUGE", "VerticalDisc", "Reboot", 2, 4, 3, "#ffd11a", "Disco vertical entre dos ruedas gigantes de polietileno: casi imposible llegar al chasis, que cuelga como un péndulo. Modelo 3D de TzHaar-Ket."],
+    ["Minotaur", "Drum", "Reboot", 4, 5, 4, "#d91f1f", "El tambor brasileño de RioBotz. Uno de los más destructivos de la competición."],
+    ["Witch Doctor", "VerticalDisc", "Reboot", 4, 4, 4, "#99f233", "Doble disco vertical del equipo de Andrea Gellatly. Subcampeón 2019 y 2021."],
+    ["Hydra", "Flipper", "Reboot", 3, 4, 4, "#ff800d", "Flipper hidráulico de Jake Ewert. Lanza al rival por los aires una y otra vez; sin daño al levantar, el daño llega al caer."],
+    ["SawBlaze", "Saw", "Reboot", 4, 4, 4, "#40cc4d", "Brazo con sierra de Jamison Go. El brazo reposa atrás sobre sus rodillos; la sierra gira con Espacio y baja mientras mantienes F. Modelo 3D de TzHaar-Ket."],
+    ["Whiplash", "VerticalDisc", "Reboot", 5, 3, 4, "#ffd11a", "Disco vertical sobre un brazo elevador de la familia Vasquez. El más rápido del plantel."],
+    ["Bronco", "Flipper", "Reboot", 3, 4, 4, "#2659e6", "Flipper neumático de Inertia Labs. Voltea rivales hasta fuera de la arena con su brazo central. Modelo 3D de TzHaar-Ket."],
+    ["Son of Whyachi", "HorizontalBar", "Reboot", 2, 5, 3, "#d91f1f", "Spinner horizontal de Team Whyachi, campeón de la era original. Lento, pesado y devastador. Modelo 3D de TzHaar-Ket."],
+    ["Hypershock", "Drum", "Reboot", 5, 4, 3, "#ffd11a", "Tambor vertical de Will Bales. Velocidad, rastrillo y estilo temerario."],
+    ["Lock-Jaw", "VerticalDisc", "Reboot", 4, 4, 4, "#d91f1f", "Disco vertical de Donald Hutson, veterano de las dos eras. Invertible. Modelo 3D de TzHaar-Ket."],
+    ["Gigabyte", "Shell", "Reboot", 2, 5, 3, "#40cc4d", "Carcasa giratoria completa de Robotic Death Company: toda la coraza es el arma."],
+    ["Monsoon", "VerticalDisc", "Reboot", 4, 4, 3, "#ff800d", "Barra vertical británica de Tom Brewster. Dos ruedas: el cuerpo bascula y funciona boca abajo. Modelo 3D de TzHaar-Ket."],
+    ["SubZero", "Flipper", "Reboot", 3, 4, 3, "#2659e6", "Flipper neumático de Jerry Clarkin. Voltea y arrincona. Modelo a partir de «Icebreaker 2» de superbomb122."]
+  ];
+
+  const rebootRest = [
+    ["Icewave","HorizontalBar"],["Ribbot","VerticalDisc"],["Rotator","HorizontalBar"],["Copperhead","Drum"],["Yeti","Drum"],["Bombshell","VerticalDisc"],
+    ["Free Shipping","Lifter"],["Blacksmith","Hammer"],["Skorpios","Hammer"],["Uppercut","VerticalDisc"],["Chomp","Hammer"],["Beta","Hammer"],
+    ["Cobalt","VerticalDisc"],["Shatter!","Hammer"],["Mammoth","Lifter"],["Glitch","Drum"],["Tantrum","VerticalDisc"],["Riptide","Drum"],
+    ["Black Dragon","Drum"],["Quantum","Crusher"],["Fusion","VerticalDisc"],["Claw Viper","Lifter"],["Deep Six","HorizontalBar"],["Hijinx","HorizontalBar"],
+    ["Kraken","Crusher"],["Lucky","Flipper"],["Malice","HorizontalBar"],["Overhaul","Lifter"],["Petunia","Crusher"],["Rusty","VerticalDisc"],
+    ["Ghost Raptor","HorizontalBar"],["Captain Shrederator","Shell"],["Warhead","VerticalDisc"],["Duck!","None"],["Valkyrie","HorizontalBar"],
+    ["Axe Backwards","Drum"],["Brutus","VerticalDisc"],["Poison Arrow","Drum"],["Sharkoprion","VerticalDisc"]
+  ];
+  const originalEra = [
+    ["BioHazard","Lifter"],["Vlad the Impaler","Lifter"],["Diesector","Crusher"],["Hazard","HorizontalBar"],["Nightmare","VerticalDisc"],["Ziggo","Shell"],
+    ["Minion","VerticalDisc"],["Toro","Flipper"],["Backlash","VerticalDisc"],["Mauler","Shell"],["Complete Control","Lifter"],["Sewer Snake","Lifter"],
+    ["Original Sin","None"],["Blendo","Shell"],["Dr. Inferno Jr.","VerticalDisc"],["Voltronic","Lifter"],["Razer","Crusher"],["Shrederator","Shell"],
+    ["OverKill","Hammer"],["Killerhurtz","Hammer"]
+  ];
+
+  function seg(n) { let s = '<div class="seg">'; for (let i = 1; i <= 5; i++) s += '<i class="' + (i <= n ? 'on' : '') + '"></i>'; return s + '</div>'; }
+  const grid = document.getElementById("featured");
+  grid.innerHTML = featured.map(r => `
+    <article class="bot" data-w="${r[1]}" style="--acc:${r[6]}">
+      <div class="plate"></div>
+      <div class="in">
+        <h3>${r[0]}</h3>
+        <div class="meta"><span class="w">${W[r[1]]}</span><span>${r[2] === "Reboot" ? "2015–" : "2000–02"}</span></div>
+        <p>${r[7]}</p>
+        <div class="stats">
+          <label>Velocidad</label>${seg(r[3])}
+          <label>Potencia</label>${seg(r[4])}
+          <label>Blindaje</label>${seg(r[5])}
+        </div>
+      </div>
+    </article>`).join("");
+
+  function chips(list, el) {
+    el.innerHTML = list.map(r => `<span data-w="${G[r[1]]}" data-weapon="${r[1]}" title="${W[r[1]]}">${r[0]}</span>`).join("");
+  }
+  chips(rebootRest, document.getElementById("roster-reboot"));
+  chips(originalEra, document.getElementById("roster-original"));
+
+  document.querySelectorAll(".filters button").forEach(b => b.addEventListener("click", () => {
+    const f = b.dataset.f;
+    document.querySelectorAll(".filters button").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+    document.querySelectorAll("#featured .bot").forEach(c => c.hidden = f !== "all" && c.dataset.w !== f);
+    document.querySelectorAll(".chips span").forEach(c => c.hidden = f !== "all" && c.dataset.weapon !== f);
+  }));
+
+  const btn = document.getElementById("dl-btn"), note = document.getElementById("dl-note");
+  if (DOWNLOAD_URL) {
+    btn.href = DOWNLOAD_URL;
+    btn.removeAttribute("aria-disabled");
+    note.textContent = "Se descarga desde la nube de Jose. Si el navegador avisa por ser un zip grande, mantén la descarga.";
+  } else {
+    btn.setAttribute("aria-disabled", "true");
+    btn.textContent = "Descarga disponible en breve";
+  }
+  document.getElementById("year").textContent = "Actualizado el " + new Date().toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" }) + ".";
+</script>
+</body>
+</html>
