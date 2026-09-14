@@ -1,0 +1,7 @@
+{
+  "version": "0.9",
+  "build": 30,
+  "installer": "https://github.com/pinguini-cmd/battlebots-arena/releases/latest/download/BattleBotsArena-Setup.exe",
+  "zip": "https://github.com/pinguini-cmd/battlebots-arena/releases/latest/download/BattleBots_Windows.zip",
+  "notes": "Instalador con icono propio, sin pantalla de Unity y con actualizador."
+}

@@ -533,30 +533,31 @@
     <div class="wrap">
       <div class="sec-head">
         <h2>Descarga</h2>
-        <p>Build para Windows de 64 bits en acceso anticipado. No hace falta instalar nada: descomprime y juega.</p>
+        <p>Instalador para Windows de 64 bits en acceso anticipado: crea el icono en el escritorio y el juego se actualiza solo desde el menú cuando sale una versión nueva.</p>
       </div>
       <div class="dl">
         <div class="dl-box">
           <p class="early">Early access</p>
-          <p class="ver">Versión 0.9 · build 29 · 82 MB</p>
+          <p class="ver">Versión 0.9.30 · instalador de 48 MB</p>
           <h3>BattleBots Arena para Windows</h3>
-          <p class="file" id="file-name">BattleBots_Windows.zip</p>
-          <p class="warn">Es una versión de acceso anticipado: el juego está en desarrollo, puede tener errores y las físicas, los robots y las arenas cambiarán entre versiones. Cada versión nueva se publica aquí mismo.</p>
-          <a class="btn btn-red" id="dl-btn" href="#instalar">Descargar el juego</a>
-          <p class="note" id="dl-note">El enlace de descarga se activa en cuanto termine el build. Si llegaste aquí antes, vuelve en un rato o pide el zip a quien te pasó esta página.</p>
+          <p class="file" id="file-name">BattleBotsArena-Setup.exe</p>
+          <p class="warn">Es una versión de acceso anticipado: el juego está en desarrollo, puede tener errores y las físicas, los robots y las arenas cambiarán entre versiones. Las versiones nuevas llegan solas: el juego avisa en el menú y se actualiza con un botón, como en Steam.</p>
+          <a class="btn btn-red" id="dl-btn" href="#instalar">Descargar el instalador</a>
+          <p class="note" id="dl-note">También hay una <a id="zip-link" href="#instalar">versión portable en zip</a> (82 MB) si prefieres no instalar nada: descomprime y abre BattleBots.exe.</p>
         </div>
         <div>
           <h3 id="instalar">Cómo instalarlo</h3>
           <ol class="steps">
-            <li>Descarga el zip y descomprímelo en una carpeta (click derecho → Extraer todo).</li>
-            <li>Abre <strong>BattleBots.exe</strong>. Si Windows SmartScreen avisa, pulsa «Más información» y luego «Ejecutar de todas formas»: el juego no está firmado.</li>
-            <li>En el menú elige tu robot, el rival, la duración y la arena, y pulsa <strong>Pelear</strong>.</li>
+            <li>Descarga <strong>BattleBotsArena-Setup.exe</strong> y ábrelo. Si Windows SmartScreen avisa, pulsa «Más información» y luego «Ejecutar de todas formas»: el juego no está firmado.</li>
+            <li>Sigue el asistente (está en español). Se instala solo para tu usuario sin pedir permisos de administrador y deja el icono en el escritorio y en el menú Inicio.</li>
+            <li>Abre el juego desde el icono, elige tu robot, el rival, la duración y la arena, y pulsa <strong>Pelear</strong>.</li>
+            <li>Cuando salga una versión nueva, el menú te avisa: pulsa <strong>Actualizar</strong> y el juego se cierra, se actualiza y vuelve a abrirse. Se desinstala desde Configuración → Aplicaciones.</li>
           </ol>
           <h3 style="margin-top:22px">Requisitos</h3>
           <ul class="req">
             <li>Windows 10 u 11 de 64 bits.</li>
             <li>Gráfica compatible con DirectX 11; con una integrada moderna va, pero baja la resolución.</li>
-            <li>Unos 600 MB libres para el juego descomprimido.</li>
+            <li>Unos 300 MB libres para el juego instalado.</li>
             <li>Para los comentaristas con voz, las voces en inglés de Windows (Configuración → Hora e idioma → Voz).</li>
           </ul>
         </div>
@@ -577,14 +578,14 @@
             <li>Qué robot usabas y contra cuál peleabas, y en qué arena.</li>
             <li>Qué pasó (se atascó, atravesó el suelo, el arma no golpeaba, se cerró el juego).</li>
             <li>Cómo repetirlo, paso a paso, y una captura o vídeo si puedes.</li>
-            <li>La versión que aparece en esta página (ahora: 0.9, build 29).</li>
+            <li>La versión que aparece abajo a la derecha del menú del juego (ahora: 0.9.30).</li>
           </ul>
           <p>También valen sugerencias: robots que faltan, cosas que no se parecen a la serie, ideas para la arena.</p>
         </div>
         <div class="mail-card">
           <p class="k">Correo del buzón</p>
           <a class="addr" href="mailto:calijuli07@gmail.com">calijuli07@gmail.com</a>
-          <a class="btn btn-red" href="mailto:calijuli07@gmail.com?subject=BattleBots%20Arena%20%E2%80%93%20bug%20o%20sugerencia&body=Robot%3A%20%0ARival%3A%20%0AArena%3A%20%0AQu%C3%A9%20pas%C3%B3%3A%20%0AC%C3%B3mo%20repetirlo%3A%20%0AVersi%C3%B3n%3A%200.9%20(build%2029)%0A">Enviar bug o sugerencia</a>
+          <a class="btn btn-red" href="mailto:calijuli07@gmail.com?subject=BattleBots%20Arena%20%E2%80%93%20bug%20o%20sugerencia&body=Robot%3A%20%0ARival%3A%20%0AArena%3A%20%0AQu%C3%A9%20pas%C3%B3%3A%20%0AC%C3%B3mo%20repetirlo%3A%20%0AVersi%C3%B3n%3A%200.9.30%0A">Enviar bug o sugerencia</a>
         </div>
       </div>
     </div>
@@ -607,8 +608,9 @@
 </footer>
 
 <script>
-  // Enlace de descarga: se rellena cuando el build esta subido (OneDrive / Drive).
-  const DOWNLOAD_URL = "https://github.com/pinguini-cmd/battlebots-arena/releases/download/v0.9/BattleBots_Windows.zip";
+  // Enlaces de descarga: 'latest' apunta siempre a la ultima release publicada en GitHub.
+  const DOWNLOAD_URL = "https://github.com/pinguini-cmd/battlebots-arena/releases/latest/download/BattleBotsArena-Setup.exe";
+  const ZIP_URL = "https://github.com/pinguini-cmd/battlebots-arena/releases/latest/download/BattleBots_Windows.zip";
 
   const W = {
     VerticalDisc: "Disco vertical", HorizontalBar: "Barra horizontal", Drum: "Tambor", Shell: "Carcasa giratoria",
@@ -695,7 +697,8 @@
   if (DOWNLOAD_URL) {
     btn.href = DOWNLOAD_URL;
     btn.removeAttribute("aria-disabled");
-    note.textContent = "Se descarga desde la nube de Jose. Si el navegador avisa por ser un zip grande, mantén la descarga.";
+    const zip = document.getElementById("zip-link");
+    if (zip && ZIP_URL) zip.href = ZIP_URL;
   } else {
     btn.setAttribute("aria-disabled", "true");
     btn.textContent = "Descarga disponible en breve";
