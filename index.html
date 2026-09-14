@@ -241,6 +241,24 @@
   ol.steps li::marker { font-family: var(--head); font-weight: 800; color: var(--hazard); }
   ul.req { margin: 0; padding-left: 20px; color: var(--chrome); display: flex; flex-direction: column; gap: 6px; }
 
+  .early {
+    display: inline-flex; align-items: center; gap: 8px; font-family: var(--head); font-weight: 800; font-size: 15px;
+    letter-spacing: .16em; text-transform: uppercase; color: #111; background: var(--hazard); padding: 4px 10px; margin: 0 0 14px;
+  }
+  .early::before { content: ""; width: 8px; height: 8px; background: var(--red); }
+  .dl-box .warn { color: var(--chrome); font-size: 15px; margin: 0 0 18px; }
+  .mailbox {
+    background: var(--steel); border: 1px solid var(--edge); border-left: 6px solid var(--hazard); padding: 28px;
+    display: grid; grid-template-columns: 1.15fr .85fr; gap: 28px; align-items: center;
+  }
+  .mailbox p { color: var(--chrome); font-size: 16px; }
+  .mailbox ul { margin: 0 0 4px; padding-left: 20px; color: var(--chrome); font-size: 15px; display: flex; flex-direction: column; gap: 4px; }
+  .mail-card { background: var(--ink); border: 1px solid var(--edge); padding: 22px; text-align: center; }
+  .mail-card .k { font-family: var(--display); font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--hazard); margin: 0 0 10px; }
+  .mail-card .addr { font-family: var(--head); font-weight: 700; font-size: 26px; color: var(--text); word-break: break-all; margin: 0 0 16px; text-decoration: none; display: block; }
+  .mail-card .addr:hover { color: var(--hazard); }
+  .mail-card .btn { width: 100%; justify-content: center; }
+
   footer { border-top: 1px solid var(--edge); padding: 40px 0 60px; color: var(--dim); font-size: 14px; }
   footer .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
   footer h4 { font-family: var(--head); font-size: 16px; letter-spacing: .14em; text-transform: uppercase; color: var(--chrome); margin: 0 0 8px; }
@@ -265,9 +283,11 @@
     .ticker div:nth-child(-n+2) { border-top: 0; }
     .features, .rules { grid-template-columns: 1fr; }
     .grid { grid-template-columns: repeat(2, 1fr); }
-    .arena, .roster, .controls, .dl, footer .wrap { grid-template-columns: 1fr; }
+    .arena, .roster, .controls, .dl, .mailbox, footer .wrap { grid-template-columns: 1fr; }
   }
   @media (max-width: 700px) {
+    .mailbox { padding: 20px 16px; }
+    .mail-card .addr { font-size: 22px; }
     body { font-size: 16px; }
     .wrap { width: calc(100% - 32px); }
     .topbar .wrap { height: 56px; }
@@ -309,6 +329,7 @@
       <a href="#arena">Arena</a>
       <a href="#reglas">Reglas</a>
       <a href="#controles">Controles</a>
+      <a href="#sugerencias">Sugerencias</a>
       <a class="cta" href="#descarga">Descargar</a>
     </nav>
   </div>
@@ -512,13 +533,15 @@
     <div class="wrap">
       <div class="sec-head">
         <h2>Descarga</h2>
-        <p>Build para Windows de 64 bits. No hace falta instalar nada: descomprime y juega.</p>
+        <p>Build para Windows de 64 bits en acceso anticipado. No hace falta instalar nada: descomprime y juega.</p>
       </div>
       <div class="dl">
         <div class="dl-box">
+          <p class="early">Early access</p>
           <p class="ver">Versión 0.9 · build 29 · 82 MB</p>
           <h3>BattleBots Arena para Windows</h3>
           <p class="file" id="file-name">BattleBots_Windows.zip</p>
+          <p class="warn">Es una versión de acceso anticipado: el juego está en desarrollo, puede tener errores y las físicas, los robots y las arenas cambiarán entre versiones. Cada versión nueva se publica aquí mismo.</p>
           <a class="btn btn-red" id="dl-btn" href="#instalar">Descargar el juego</a>
           <p class="note" id="dl-note">El enlace de descarga se activa en cuanto termine el build. Si llegaste aquí antes, vuelve en un rato o pide el zip a quien te pasó esta página.</p>
         </div>
@@ -540,6 +563,32 @@
       </div>
     </div>
   </section>
+  <section id="sugerencias">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Buzón de sugerencias</h2>
+        <p>Como es acceso anticipado, tu ayuda cuenta: cada bug que reportes se arregla en la siguiente versión.</p>
+      </div>
+      <div class="mailbox">
+        <div>
+          <h3>¿Encontraste un bug? ¿Tienes una idea?</h3>
+          <p>Escríbeme al correo de al lado. Si es un fallo, cuéntame lo que necesito para repetirlo:</p>
+          <ul>
+            <li>Qué robot usabas y contra cuál peleabas, y en qué arena.</li>
+            <li>Qué pasó (se atascó, atravesó el suelo, el arma no golpeaba, se cerró el juego).</li>
+            <li>Cómo repetirlo, paso a paso, y una captura o vídeo si puedes.</li>
+            <li>La versión que aparece en esta página (ahora: 0.9, build 29).</li>
+          </ul>
+          <p>También valen sugerencias: robots que faltan, cosas que no se parecen a la serie, ideas para la arena.</p>
+        </div>
+        <div class="mail-card">
+          <p class="k">Correo del buzón</p>
+          <a class="addr" href="mailto:calijuli07@gmail.com">calijuli07@gmail.com</a>
+          <a class="btn btn-red" href="mailto:calijuli07@gmail.com?subject=BattleBots%20Arena%20%E2%80%93%20bug%20o%20sugerencia&body=Robot%3A%20%0ARival%3A%20%0AArena%3A%20%0AQu%C3%A9%20pas%C3%B3%3A%20%0AC%C3%B3mo%20repetirlo%3A%20%0AVersi%C3%B3n%3A%200.9%20(build%2029)%0A">Enviar bug o sugerencia</a>
+        </div>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer>
@@ -552,7 +601,7 @@
     <div>
       <h4>Aviso</h4>
       <p>Proyecto de aficionado sin ánimo de lucro. BattleBots y los nombres de los robots pertenecen a sus dueños (BattleBots Inc. y los equipos); esta página y el juego no tienen relación con ellos ni con Discovery.</p>
-      <p>Página publicada para compartir el juego con amigos. <span id="year"></span></p>
+      <p>Acceso anticipado: bugs y sugerencias a <a href="mailto:calijuli07@gmail.com">calijuli07@gmail.com</a>. <span id="year"></span></p>
     </div>
   </div>
 </footer>
