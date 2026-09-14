@@ -1,7 +1,7 @@
 {
   "version": "0.9",
-  "build": 31,
+  "build": 32,
   "installer": "https://github.com/pinguini-cmd/battlebots-arena/releases/latest/download/BattleBotsArena-Setup.exe",
   "zip": "https://github.com/pinguini-cmd/battlebots-arena/releases/latest/download/BattleBots_Windows.zip",
-  "notes": "Tombstone con fuerza correcta, cunas que levantan de verdad, camara de pilotos al lado y actualizador automatico."
+  "notes": "Martillos y self-righters corregidos, cunas triangulares, robots de dos ruedas y patitas de HUGE quietas."
 }
