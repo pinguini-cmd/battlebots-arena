@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b0c0e">
 <meta name="description" content="BattleBots Arena: simulador de combate de robots hecho en Unity con fisicas soft-body. Robots, arena, reglas, controles y descarga para Windows.">
 <meta property="og:title" content="BattleBots Arena">
 <meta property="og:description" content="Simulador de combate de robots hecho en Unity. Descarga para Windows.">
@@ -78,6 +79,12 @@
   .nav a:hover { color: var(--text); background: var(--steel-2); }
   .nav a.cta { background: var(--red); color: #fff; }
   .nav a.cta:hover { background: #ff2b33; }
+  .menu-btn {
+    display: none; background: none; border: 1px solid var(--edge); width: 46px; height: 42px; padding: 0; cursor: pointer;
+    flex-direction: column; justify-content: center; align-items: center; gap: 5px;
+  }
+  .menu-btn span { display: block; width: 22px; height: 2px; background: var(--chrome); }
+  .menu-btn[aria-expanded="true"] span { background: var(--hazard); }
 
   /* ── Hero ─────────────────────────────────────── */
   .hero {
@@ -241,6 +248,15 @@
   footer a { color: var(--chrome); }
 
   @media (max-width: 960px) {
+    .topbar .wrap { position: relative; }
+    .menu-btn { display: inline-flex; }
+    .nav {
+      display: none; position: absolute; left: 0; right: 0; top: 100%; flex-direction: column; gap: 0;
+      background: rgba(11, 12, 14, .98); border-bottom: 1px solid var(--edge); padding: 6px 12px 14px;
+    }
+    .nav.open { display: flex; }
+    .nav a { display: block; padding: 13px 10px; font-size: 18px; border-bottom: 1px solid var(--edge); }
+    .nav a.cta { margin-top: 10px; text-align: center; border-bottom: 0; }
     .hero .wrap { grid-template-columns: 1fr; padding: 44px 0 40px; }
     .spinner { display: none; }
     .ticker .wrap { grid-template-columns: 1fr 1fr; }
@@ -250,14 +266,34 @@
     .features, .rules { grid-template-columns: 1fr; }
     .grid { grid-template-columns: repeat(2, 1fr); }
     .arena, .roster, .controls, .dl, footer .wrap { grid-template-columns: 1fr; }
-    .nav a:not(.cta) { display: none; }
   }
-  @media (max-width: 560px) {
-    .grid { grid-template-columns: 1fr; }
-    .haz { grid-template-columns: 1fr; }
-    .ticker .wrap { grid-template-columns: 1fr; }
-    .ticker div { border-left: 0; padding-left: 0; }
+  @media (max-width: 700px) {
+    body { font-size: 16px; }
+    .wrap { width: calc(100% - 32px); }
+    .topbar .wrap { height: 56px; }
+    .mark { font-size: 15px; }
     .mark .tag { display: none; }
+    section { padding: 48px 0; }
+    .sec-head { margin-bottom: 24px; }
+    .hero .wrap { padding: 34px 0 32px; gap: 26px; }
+    h1 { font-size: clamp(42px, 12.5vw, 64px); }
+    .lede { font-size: 17px; margin-bottom: 22px; }
+    .ctas .btn, .dl-box .btn { width: 100%; justify-content: center; }
+    .btn { font-size: 18px; padding: 14px 20px; }
+    .ticker div { padding: 16px 14px; }
+    .ticker b { font-size: 36px; }
+    .filters { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
+    .filters button { flex: 0 0 auto; min-height: 42px; }
+    .grid { grid-template-columns: 1fr; }
+    .bot:hover { transform: none; }
+    .haz { grid-template-columns: 1fr; }
+    .eras li { grid-template-columns: 78px 1fr; }
+    .rule .big { font-size: 64px; }
+    .rule { padding: 20px 18px; }
+    th, td { padding: 8px 8px; font-size: 15px; }
+    .dl-box { padding: 24px 18px 22px; }
+    .dl-box h3 { font-size: 28px; }
+    footer { padding: 32px 0 48px; }
   }
 </style>
 </head>
@@ -266,7 +302,8 @@
 <header class="topbar">
   <div class="wrap">
     <a class="mark" href="#top">Battle<b>Bots</b> Arena <span class="tag">FAN-MADE</span></a>
-    <nav class="nav" aria-label="Secciones">
+    <button class="menu-btn" type="button" aria-label="Abrir el menú" aria-expanded="false" aria-controls="nav"><span></span><span></span><span></span></button>
+    <nav class="nav" id="nav" aria-label="Secciones">
       <a href="#combate">Combate</a>
       <a href="#robots">Robots</a>
       <a href="#arena">Arena</a>
@@ -297,7 +334,7 @@
         </div>
       </div>
       <figure class="screen">
-        <img src="hero.jpg" width="1572" height="672" alt="Pantalla de inicio del juego: título BattleBots sobre chapa de acero, tarjeta VS y paneles para elegir tu robot, el rival y la duración del combate.">
+        <img src="hero.jpg" srcset="hero-900.jpg 900w, hero.jpg 1572w" sizes="(max-width: 960px) 100vw, 560px" width="1572" height="672" decoding="async" alt="Pantalla de inicio del juego: título BattleBots sobre chapa de acero, tarjeta VS y paneles para elegir tu robot, el rival y la duración del combate.">
         <figcaption><span>Pantalla de inicio</span><i>Bite Force vs Saw Blaze</i></figcaption>
       </figure>
     </div>
@@ -595,6 +632,15 @@
     document.querySelectorAll("#featured .bot").forEach(c => c.hidden = f !== "all" && c.dataset.w !== f);
     document.querySelectorAll(".chips span").forEach(c => c.hidden = f !== "all" && c.dataset.weapon !== f);
   }));
+
+  const menuBtn = document.querySelector(".menu-btn"), nav = document.getElementById("nav");
+  menuBtn.addEventListener("click", () => {
+    const open = !nav.classList.contains("open");
+    nav.classList.toggle("open", open);
+    menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    menuBtn.setAttribute("aria-label", open ? "Cerrar el menú" : "Abrir el menú");
+  });
+  nav.querySelectorAll("a").forEach(a => a.addEventListener("click", () => { nav.classList.remove("open"); menuBtn.setAttribute("aria-expanded", "false"); }));
 
   const btn = document.getElementById("dl-btn"), note = document.getElementById("dl-note");
   if (DOWNLOAD_URL) {
