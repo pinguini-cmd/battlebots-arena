@@ -1,7 +1,7 @@
 {
   "version": "0.9",
-  "build": 32,
+  "build": 33,
   "installer": "https://github.com/pinguini-cmd/battlebots-arena/releases/latest/download/BattleBotsArena-Setup.exe",
   "zip": "https://github.com/pinguini-cmd/battlebots-arena/releases/latest/download/BattleBots_Windows.zip",
-  "notes": "Martillos y self-righters corregidos, cunas triangulares, robots de dos ruedas y patitas de HUGE quietas."
+  "notes": "Bite Force y Monsoon con color, VS nitido, camara que no atraviesa la arena y gradas de fondo."
 }
