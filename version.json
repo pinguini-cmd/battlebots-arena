@@ -1,7 +1,7 @@
 {
   "version": "0.9",
-  "build": 34,
+  "build": 35,
   "installer": "https://github.com/pinguini-cmd/battlebots-arena/releases/latest/download/BattleBotsArena-Setup.exe",
   "zip": "https://github.com/pinguini-cmd/battlebots-arena/releases/latest/download/BattleBots_Windows.zip",
-  "notes": "Intro con semaforo y boton de saltar, luces dinamicas en la arena, mas rebote en los golpes, martillos y flippers mas letales, killsaws solo al ultimo minuto, escombros que se quedan en el suelo, sonidos de multitud e inicio/fin de pelea y mas fluidez."
+  "notes": "Flippers mas fuertes (menos Bronco) y la IA los dispara cuando ya esta debajo del rival; martillos con menos daño y solo cuando golpean; los spinners ya no se quedan parados de canto; escombros que se pueden empujar y reaccionan a las armas; semaforo mas pequeño pegado a la pared; la camara de piloto enfoca solo tu robot; martillos de la arena con material metalico."
 }
