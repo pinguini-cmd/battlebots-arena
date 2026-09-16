@@ -1,7 +1,7 @@
 {
   "version": "0.9",
-  "build": 33,
+  "build": 34,
   "installer": "https://github.com/pinguini-cmd/battlebots-arena/releases/latest/download/BattleBotsArena-Setup.exe",
   "zip": "https://github.com/pinguini-cmd/battlebots-arena/releases/latest/download/BattleBots_Windows.zip",
-  "notes": "Bite Force y Monsoon con color, VS nitido, camara que no atraviesa la arena y gradas de fondo."
+  "notes": "Intro con semaforo y boton de saltar, luces dinamicas en la arena, mas rebote en los golpes, martillos y flippers mas letales, killsaws solo al ultimo minuto, escombros que se quedan en el suelo, sonidos de multitud e inicio/fin de pelea y mas fluidez."
 }
